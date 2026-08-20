@@ -28,6 +28,7 @@ export default {
 		completed: '#157743',
 		success: '#00C851',
 		success_light: '#F0FDF5',
+		border: '#E7E7E7',
 
 		warning: '#FFBB33',
 		error: '#ff6961',
@@ -37,6 +38,8 @@ export default {
 		info_light: '#33b5e5bf',
 		back: '#eea80c',
 		back_light: '#f2c62f',
+		calendar: '#43bec6',
+		calendar_dark: '#008d95',
 
 		transparent: 'transparent',
 		darkTransparent: 'rgba(0,0,0,0.6)',
@@ -44,6 +47,7 @@ export default {
 
 		green: '#157743',
 		borderGray: '#E7E7E7',
+		alert: '#ff6961',
 	},
 
 	fonts: {
