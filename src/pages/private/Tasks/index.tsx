@@ -13,6 +13,7 @@ import type { Task, TaskFilters as TaskFiltersData, TaskRequest } from "../../..
 import { Button, Pagination } from "../../../components/tasks/styles";
 import { ConfirmDialog } from "../../../components/tasks/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "../../../components/tasks/TaskStates";
+import { PrivateNavigation } from "../../../components/layout/PrivateNavigation";
 import { TaskBoard } from "../../../components/tasks/TaskBoard";
 import { TaskDetailsModal } from "../../../components/tasks/TaskDetailsModal";
 import { TaskFilters } from "../../../components/tasks/TaskFilters";
@@ -102,6 +103,7 @@ const Tasks = () => {
           <strong>{user?.name}</strong>
           <span>{user?.email}</span>
         </UserInfo>
+        <PrivateNavigation />
         <Button type="button" $variant="ghost" onClick={signOut}>
           Sair
         </Button>

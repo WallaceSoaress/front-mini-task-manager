@@ -4,7 +4,11 @@ import { PrivateRoutes } from "./adminRoutes/privateRoutes";
 import { PublicRoutes } from "./publicRoutes";
 
 export function AppRoutes() {
-  const { isAuthorized } = useAuth();
+  const { isAuthorized, isLoadingAuth } = useAuth();
+
+  if (isLoadingAuth) {
+    return null;
+  }
 
   return (
     <BrowserRouter>

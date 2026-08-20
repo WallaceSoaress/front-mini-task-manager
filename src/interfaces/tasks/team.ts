@@ -9,3 +9,8 @@ export type Team = {
   name: string;
   members: TeamMember[];
 };
+
+export type TeamRequest = {
+  name: string;
+  memberIds: string[];
+};

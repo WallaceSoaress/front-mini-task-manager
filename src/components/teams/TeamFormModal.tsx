@@ -1,0 +1,125 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { ValidationError } from "yup";
+import type { User } from "../../interfaces/tasks/user";
+import type { TeamFormData } from "../../validations/teams/teamSchema";
+import { toTeamRequest, validateTeamForm } from "../../validations/teams/teamSchema";
+import { Button, Field, FieldError, FormGrid, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "../tasks/styles";
+import { HelperText } from "./styles";
+
+type TeamFormModalProps = {
+  users: User[];
+  isLoading?: boolean;
+  isLoadingUsers?: boolean;
+  usersError?: string;
+  apiError?: string;
+  onClose: () => void;
+  onSubmit: (data: ReturnType<typeof toTeamRequest>) => Promise<void>;
+};
+
+const defaultValues: TeamFormData = {
+  name: "",
+  memberIds: [],
+};
+
+export function TeamFormModal({ users, isLoading, isLoadingUsers, usersError, apiError, onClose, onSubmit }: TeamFormModalProps) {
+  const [formError, setFormError] = useState("");
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+    setError,
+    setValue,
+    watch,
+  } = useForm<TeamFormData>({
+    defaultValues,
+  });
+  const selectedMemberIds = watch("memberIds");
+
+  async function submit(data: TeamFormData) {
+    setFormError("");
+
+    try {
+      const validData = await validateTeamForm({
+        ...data,
+        memberIds: selectedMemberIds,
+      });
+      await onSubmit(toTeamRequest(validData));
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        err.inner.forEach((issue) => {
+          if (issue.path) {
+            setError(issue.path as keyof TeamFormData, { message: issue.message });
+          }
+        });
+        return;
+      }
+
+      setFormError("Nao foi possivel salvar o time.");
+    }
+  }
+
+  return (
+    <ModalBackdrop role="presentation">
+      <ModalPanel role="dialog" aria-modal="true" aria-labelledby="team-form-title">
+        <ModalHeader>
+          <div>
+            <h2 id="team-form-title">Novo Time</h2>
+            <p>Cadastre um time e selecione os membros disponiveis.</p>
+          </div>
+          <Button type="button" $variant="ghost" onClick={onClose} disabled={isLoading}>
+            Fechar
+          </Button>
+        </ModalHeader>
+
+        <ModalBody>
+          <FormGrid onSubmit={handleSubmit(submit)}>
+            <Field className="full">
+              Nome do time
+              <input {...register("name")} autoFocus maxLength={120} placeholder="Time Front-end" />
+              {errors.name?.message ? <FieldError>{errors.name.message}</FieldError> : null}
+            </Field>
+
+            <Field className="full">
+              Membros
+              <select
+                multiple
+                size={Math.min(Math.max(users.length, 3), 8)}
+                value={selectedMemberIds}
+                onChange={(event) => {
+                  const memberIds = Array.from(event.currentTarget.selectedOptions, (option) => option.value);
+                  setValue("memberIds", memberIds, { shouldDirty: true, shouldValidate: true });
+                }}
+                disabled={isLoadingUsers || Boolean(usersError)}
+              >
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} - {user.email}
+                  </option>
+                ))}
+              </select>
+              <HelperText>
+                {usersError ||
+                  (isLoadingUsers
+                    ? "Carregando usuarios..."
+                    : "Selecione um ou mais membros. Este campo e opcional.")}
+              </HelperText>
+              {errors.memberIds?.message ? <FieldError>{errors.memberIds.message}</FieldError> : null}
+            </Field>
+
+            {apiError || formError ? <FieldError className="full">{apiError || formError}</FieldError> : null}
+
+            <ModalActions>
+              <Button type="button" $variant="ghost" onClick={onClose} disabled={isLoading}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Salvando..." : "Salvar"}
+              </Button>
+            </ModalActions>
+          </FormGrid>
+        </ModalBody>
+      </ModalPanel>
+    </ModalBackdrop>
+  );
+}

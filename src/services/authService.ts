@@ -25,3 +25,13 @@ export async function login(credentials: LoginRequest) {
 
   return response.user;
 }
+
+export async function getCurrentUser() {
+  return apiFetch<AuthenticatedUser>("/auth/me");
+}
+
+export async function logout() {
+  return apiFetch<void>("/auth/logout", {
+    method: "POST",
+  });
+}
