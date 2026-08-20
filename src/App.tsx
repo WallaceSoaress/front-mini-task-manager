@@ -1,10 +1,13 @@
+import { ThemeProvider, useTheme } from "styled-components";
 import "./styles/global-styles.css";
 
 function App() {
+  const theme = useTheme();
+
   return (
-    <div>
+    <ThemeProvider theme={theme}>
       <h1>Login</h1>
-    </div>
+    </ThemeProvider>
   );
 }
 
