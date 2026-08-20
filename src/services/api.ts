@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type ApiErrorResponse = {
   error?: string;
@@ -36,7 +36,10 @@ export async function apiFetch<TResponse>(
   }
 
   if (!response.ok) {
-    throw new ApiRequestError(await readErrorMessage(response), response.status);
+    throw new ApiRequestError(
+      await readErrorMessage(response),
+      response.status,
+    );
   }
 
   if (response.status === 204) {
@@ -49,7 +52,12 @@ export async function apiFetch<TResponse>(
 async function readErrorMessage(response: Response) {
   try {
     const data = (await response.json()) as ApiErrorResponse;
-    return data.details?.[0] ?? data.message ?? data.error ?? "Erro ao processar a requisicao.";
+    return (
+      data.details?.[0] ??
+      data.message ??
+      data.error ??
+      "Erro ao processar a requisicao."
+    );
   } catch {
     return response.status === 401 || response.status === 403
       ? "E-mail ou senha invalidos."
