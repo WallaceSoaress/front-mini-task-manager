@@ -28,6 +28,25 @@ export const TeamCard = styled.article`
   }
 `;
 
+export const TeamCardHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+`;
+
+export const TeamActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
 export const MemberList = styled.ul`
   display: flex;
   flex-wrap: wrap;

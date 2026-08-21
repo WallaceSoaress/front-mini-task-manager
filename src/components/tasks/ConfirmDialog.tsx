@@ -1,15 +1,16 @@
-import { Button, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "./styles";
+import { Button, FieldError, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "./styles";
 
 type ConfirmDialogProps = {
   title: string;
   message: string;
   confirmLabel: string;
+  errorMessage?: string;
   isLoading?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 };
 
-export function ConfirmDialog({ title, message, confirmLabel, isLoading, onCancel, onConfirm }: ConfirmDialogProps) {
+export function ConfirmDialog({ title, message, confirmLabel, errorMessage, isLoading, onCancel, onConfirm }: ConfirmDialogProps) {
   return (
     <ModalBackdrop role="presentation">
       <ModalPanel role="dialog" aria-modal="true" aria-labelledby="confirm-title">
@@ -21,6 +22,7 @@ export function ConfirmDialog({ title, message, confirmLabel, isLoading, onCance
         </ModalHeader>
         <ModalBody>
           <p>{message}</p>
+          {errorMessage ? <FieldError role="alert">{errorMessage}</FieldError> : null}
           <ModalActions>
             <Button type="button" $variant="ghost" onClick={onCancel} disabled={isLoading}>
               Cancelar

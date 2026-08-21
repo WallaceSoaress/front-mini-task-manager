@@ -1,77 +1,89 @@
-# React + TypeScript + Vite
+# Mini Task Manager Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend React do desafio tecnico Mini Task Manager.
 
-Currently, two official plugins are available:
+A aplicacao consome a API Spring Boot, usa autenticacao por cookie HttpOnly e entrega as telas privadas de tarefas e times solicitadas na prova tecnica.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Escopo entregue
 
-## React Compiler
+- Login integrado com `POST /auth/login`.
+- Identificacao da sessao autenticada por `GET /auth/me`.
+- Rotas publicas e privadas.
+- Board de tarefas inspirado no Jira.
+- Filtros por status, responsavel e prioridade.
+- Listagem paginada de tarefas.
+- Criacao, edicao, detalhes e exclusao de tarefas.
+- Cadastro de times com selecao de membros.
+- Exclusao de times com confirmacao e tratamento de bloqueio da API.
+- Requisicoes autenticadas com `credentials: "include"`.
+- Sem armazenamento de JWT em `localStorage` ou `sessionStorage`.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Decisoes tecnicas
 
-Note: This will impact Vite dev & build performances.
+- React com TypeScript e Vite para uma base simples e rapida.
+- React Router para separar rotas publicas e privadas.
+- Context API para estado de autenticacao.
+- TanStack Query para consultas, mutations, cache e invalidacao de listagens.
+- React Hook Form e Yup para formularios e validacoes.
+- Styled Components com tema centralizado para estilos.
+- Services dedicados para chamadas HTTP, evitando requisicoes diretas dentro das paginas.
 
-## Expanding the ESLint configuration
+## Configuracao
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Crie um `.env` baseado no `.env.example`:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```env
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+A API precisa permitir CORS com credenciais para a origem do frontend, por padrao:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+http://localhost:5173
 ```
+
+## Como executar
+
+Instale as dependencias:
+
+```bash
+npm install
+```
+
+Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+Acesse:
+
+```text
+http://localhost:5173
+```
+
+## Como testar o fluxo principal
+
+1. Suba a API em `http://localhost:8080`.
+2. Cadastre ou autentique um usuario pela API.
+3. Abra o frontend em `http://localhost:5173`.
+4. Faca login.
+5. Crie um time em `Times`.
+6. Crie uma tarefa associada a esse time.
+7. Verifique o board, filtros, detalhes, edicao e exclusao de tarefas.
+8. Tente excluir um time com tarefa vinculada e confirme que a API bloqueia a exclusao.
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+```
+
+## Observacoes
+
+- O cookie de autenticacao e criado pela API como HttpOnly.
+- O frontend nunca le o token diretamente.
+- Ao atualizar a pagina, o estado autenticado e recuperado por `GET /auth/me`.
+- As listagens sao atualizadas por invalidacao de queries, sem `window.location.reload()`.

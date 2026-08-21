@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { ValidationError } from "yup";
 import type { User } from "../../interfaces/tasks/user";
 import type { TeamFormData } from "../../validations/teams/teamSchema";
@@ -25,16 +25,16 @@ const defaultValues: TeamFormData = {
 export function TeamFormModal({ users, isLoading, isLoadingUsers, usersError, apiError, onClose, onSubmit }: TeamFormModalProps) {
   const [formError, setFormError] = useState("");
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
     setError,
     setValue,
-    watch,
   } = useForm<TeamFormData>({
     defaultValues,
   });
-  const selectedMemberIds = watch("memberIds");
+  const selectedMemberIds = useWatch({ control, name: "memberIds" }) ?? [];
 
   async function submit(data: TeamFormData) {
     setFormError("");

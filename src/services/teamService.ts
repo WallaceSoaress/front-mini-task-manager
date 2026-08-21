@@ -11,3 +11,9 @@ export async function createTeam(payload: TeamRequest) {
     body: JSON.stringify(payload),
   });
 }
+
+export async function deleteTeam(id: string) {
+  return apiFetch<void>(`/teams/${id}`, {
+    method: "DELETE",
+  });
+}

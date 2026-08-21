@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TaskPageParams, TaskRequest } from "../../interfaces/tasks/task";
 import type { TeamRequest } from "../../interfaces/tasks/team";
 import { createTask, deleteTask, getTask, listTasks, updateTask } from "../../services/taskService";
-import { createTeam, listTeams } from "../../services/teamService";
+import { createTeam, deleteTeam, listTeams } from "../../services/teamService";
 import { listUsers } from "../../services/userService";
 import { taskKeys, teamKeys, userKeys } from "./queryKeys";
 
@@ -70,6 +70,15 @@ export function useCreateTeam() {
 
   return useMutation({
     mutationFn: (payload: TeamRequest) => createTeam(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.all }),
+  });
+}
+
+export function useDeleteTeam() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteTeam(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: teamKeys.all }),
   });
 }

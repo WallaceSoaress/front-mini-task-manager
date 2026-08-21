@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PrivateNavigation } from "../../../components/layout/PrivateNavigation";
+import { ConfirmDialog } from "../../../components/tasks/ConfirmDialog";
 import { Button, Toolbar, ToolbarHeader } from "../../../components/tasks/styles";
 import { ErrorState, LoadingState } from "../../../components/tasks/TaskStates";
 import { TeamFormModal } from "../../../components/teams/TeamFormModal";
@@ -7,8 +8,8 @@ import { TeamList } from "../../../components/teams/TeamList";
 import { EmptyTeamsState } from "../../../components/teams/TeamStates";
 import { SuccessMessage } from "../../../components/teams/styles";
 import { useAuth } from "../../../hooks/auth";
-import { useCreateTeam, useTeams, useUsers } from "../../../hooks/tasks/useTasks";
-import type { TeamRequest } from "../../../interfaces/tasks/team";
+import { useCreateTeam, useDeleteTeam, useTeams, useUsers } from "../../../hooks/tasks/useTasks";
+import type { Team, TeamRequest } from "../../../interfaces/tasks/team";
 import { ApiRequestError } from "../../../services/api";
 import { HeaderActions, TeamsShell, TeamsTopBar, TeamsUserInfo } from "./styles";
 
@@ -25,15 +26,19 @@ const Teams = () => {
   const teamsQuery = useTeams();
   const usersQuery = useUsers();
   const createTeam = useCreateTeam();
+  const deleteTeam = useDeleteTeam();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formError, setFormError] = useState("");
+  const [listError, setListError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   const teams = teamsQuery.data ?? [];
   const users = usersQuery.data ?? [];
 
   function openForm() {
     setFormError("");
+    setListError("");
     setSuccessMessage("");
     setIsFormOpen(true);
   }
@@ -47,6 +52,23 @@ const Teams = () => {
       setSuccessMessage("Time cadastrado com sucesso.");
     } catch (error) {
       setFormError(getErrorMessage(error));
+    }
+  }
+
+  async function handleDeleteTeam() {
+    if (!teamToDelete) {
+      return;
+    }
+
+    setListError("");
+    setSuccessMessage("");
+
+    try {
+      await deleteTeam.mutateAsync(teamToDelete.id);
+      setTeamToDelete(null);
+      setSuccessMessage("Time excluido com sucesso.");
+    } catch (error) {
+      setListError(getErrorMessage(error));
     }
   }
 
@@ -79,6 +101,7 @@ const Teams = () => {
       </Toolbar>
 
       {successMessage ? <SuccessMessage role="status">{successMessage}</SuccessMessage> : null}
+      {listError ? <ErrorState message={listError} /> : null}
 
       {teamsQuery.isLoading ? <LoadingState message="Carregando times..." /> : null}
 
@@ -88,7 +111,16 @@ const Teams = () => {
 
       {teamsQuery.isSuccess && teams.length === 0 ? <EmptyTeamsState onCreate={openForm} /> : null}
 
-      {teamsQuery.isSuccess && teams.length > 0 ? <TeamList teams={teams} /> : null}
+      {teamsQuery.isSuccess && teams.length > 0 ? (
+        <TeamList
+          teams={teams}
+          onDeleteTeam={(team) => {
+            setListError("");
+            setSuccessMessage("");
+            setTeamToDelete(team);
+          }}
+        />
+      ) : null}
 
       {isFormOpen ? (
         <TeamFormModal
@@ -99,6 +131,23 @@ const Teams = () => {
           isLoading={createTeam.isPending}
           onClose={() => setIsFormOpen(false)}
           onSubmit={handleSubmitTeam}
+        />
+      ) : null}
+
+      {teamToDelete ? (
+        <ConfirmDialog
+          title="Excluir time"
+          message={`Tem certeza que deseja excluir "${teamToDelete.name}"? Essa acao so sera concluida se nao houver demandas vinculadas ao time.`}
+          confirmLabel="Excluir"
+          errorMessage={listError}
+          isLoading={deleteTeam.isPending}
+          onCancel={() => {
+            if (!deleteTeam.isPending) {
+              setTeamToDelete(null);
+              setListError("");
+            }
+          }}
+          onConfirm={handleDeleteTeam}
         />
       ) : null}
     </TeamsShell>

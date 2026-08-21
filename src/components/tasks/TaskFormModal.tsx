@@ -32,11 +32,14 @@ const defaultValues: TaskFormData = {
 export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose, onSubmit }: TaskFormModalProps) {
   const [formError, setFormError] = useState("");
   const {
+    clearErrors,
     formState: { errors },
+    getValues,
     handleSubmit,
     register,
     reset,
     setError,
+    setValue,
   } = useForm<TaskFormData>({
     defaultValues,
   });
@@ -53,12 +56,26 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
             teamId: task.team.id,
             dueDate: task.dueDate ?? "",
           }
-        : {
-            ...defaultValues,
-            teamId: teams[0]?.id ?? "",
-          },
+        : defaultValues,
     );
-  }, [reset, task, teams]);
+  }, [reset, task]);
+
+  useEffect(() => {
+    const firstTeamId = teams[0]?.id ?? "";
+
+    if (!task && firstTeamId && !getValues("teamId")) {
+      setValue("teamId", firstTeamId);
+    }
+  }, [getValues, setValue, task, teams]);
+
+  function registerField(field: keyof TaskFormData) {
+    return register(field, {
+      onChange: () => {
+        clearErrors(field);
+        setFormError("");
+      },
+    });
+  }
 
   async function submit(data: TaskFormData) {
     setFormError("");
@@ -97,19 +114,19 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
           <FormGrid onSubmit={handleSubmit(submit)}>
             <Field>
               Titulo
-              <input {...register("title")} autoFocus maxLength={160} />
+              <input {...registerField("title")} autoFocus maxLength={160} />
               {errors.title?.message ? <FieldError>{errors.title.message}</FieldError> : null}
             </Field>
 
             <Field>
               Descricao
-              <textarea {...register("description")} />
+              <textarea {...registerField("description")} />
               {errors.description?.message ? <FieldError>{errors.description.message}</FieldError> : null}
             </Field>
 
             <Field>
               Status
-              <select {...register("status")}>
+              <select {...registerField("status")}>
                 {Object.entries(statusLabels).map(([status, label]) => (
                   <option key={status} value={status}>
                     {label}
@@ -121,7 +138,7 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
 
             <Field>
               Prioridade
-              <select {...register("priority")}>
+              <select {...registerField("priority")}>
                 {Object.entries(priorityLabels).map(([priority, label]) => (
                   <option key={priority} value={priority}>
                     {label}
@@ -133,7 +150,7 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
 
             <Field>
               Responsavel
-              <select {...register("responsibleId")}>
+              <select {...registerField("responsibleId")}>
                 <option value="">Nao atribuido</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
@@ -146,7 +163,7 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
 
             <Field>
               Time
-              <select {...register("teamId")}>
+              <select {...registerField("teamId")}>
                 <option value="">Selecione</option>
                 {teams.map((team) => (
                   <option key={team.id} value={team.id}>
@@ -159,7 +176,7 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
 
             <Field className="full">
               Prazo
-              <input {...register("dueDate")} type="date" />
+              <input {...registerField("dueDate")} type="date" />
               {errors.dueDate?.message ? <FieldError>{errors.dueDate.message}</FieldError> : null}
             </Field>
 
