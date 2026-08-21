@@ -9,7 +9,7 @@ import {
   useUpdateTask,
   useUsers,
 } from "../../../hooks/tasks/useTasks";
-import type { Task, TaskFilters as TaskFiltersData, TaskRequest } from "../../../interfaces/tasks/task";
+import type { Task, TaskFilters as TaskFiltersData, TaskRequest, TaskStatus } from "../../../interfaces/tasks/task";
 import { Button, Pagination } from "../../../components/tasks/styles";
 import { ConfirmDialog } from "../../../components/tasks/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "../../../components/tasks/TaskStates";
@@ -34,6 +34,18 @@ function getErrorMessage(error: unknown) {
   return "Nao foi possivel concluir a operacao.";
 }
 
+function taskToRequest(task: Task, status: TaskStatus = task.status): TaskRequest {
+  return {
+    title: task.title,
+    description: task.description ?? null,
+    status,
+    priority: task.priority,
+    responsibleId: task.responsible?.id ?? null,
+    teamId: task.team.id,
+    dueDate: task.dueDate ?? null,
+  };
+}
+
 const Tasks = () => {
   const { signOut, user } = useAuth();
   const [filters, setFilters] = useState<TaskFiltersData>({});
@@ -42,6 +54,7 @@ const Tasks = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [formError, setFormError] = useState("");
+  const [boardError, setBoardError] = useState("");
 
   const taskParams = useMemo(
     () => ({
@@ -78,9 +91,20 @@ const Tasks = () => {
       } else {
         await createTask.mutateAsync(payload);
       }
+      setBoardError("");
       setFormMode(null);
     } catch (error) {
       setFormError(getErrorMessage(error));
+    }
+  }
+
+  async function handleMoveTask(task: Task, status: TaskStatus) {
+    setBoardError("");
+
+    try {
+      await updateTask.mutateAsync({ id: task.id, payload: taskToRequest(task, status) });
+    } catch (error) {
+      setBoardError(getErrorMessage(error));
     }
   }
 
@@ -130,6 +154,8 @@ const Tasks = () => {
         <ErrorState message={getErrorMessage(tasksQuery.error)} onRetry={() => tasksQuery.refetch()} />
       ) : null}
 
+      {boardError ? <ErrorState message={boardError} /> : null}
+
       {tasksQuery.isSuccess && tasks.length === 0 ? (
         <EmptyState
           onCreate={() => {
@@ -141,7 +167,7 @@ const Tasks = () => {
 
       {tasksQuery.isSuccess && tasks.length > 0 ? (
         <>
-          <TaskBoard tasks={tasks} onOpenTask={setSelectedTask} />
+          <TaskBoard tasks={tasks} onOpenTask={setSelectedTask} onMoveTask={handleMoveTask} />
 
           <Pagination aria-label="Paginacao de tarefas">
             <span>
@@ -165,7 +191,6 @@ const Tasks = () => {
       {formMode ? (
         <TaskFormModal
           task={formMode.type === "edit" ? formMode.task : null}
-          users={users}
           teams={teams}
           apiError={formError}
           isLoading={isFormLoading}

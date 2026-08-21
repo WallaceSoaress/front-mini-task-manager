@@ -14,7 +14,7 @@ export type TaskFormData = {
 
 const apiDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
-function normalizeDueDate(value: string) {
+export function normalizeDueDate(value: string) {
   const trimmedValue = value.trim();
 
   if (!trimmedValue) {
@@ -32,6 +32,15 @@ function normalizeDueDate(value: string) {
   }
 
   const [, day, month, year] = brazilianDateMatch;
+  return `${year}-${month}-${day}`;
+}
+
+function todayAsApiDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
   return `${year}-${month}-${day}`;
 }
 
@@ -63,6 +72,13 @@ export const taskSchema: yup.ObjectSchema<TaskFormData> = yup
 
         const date = new Date(`${value}T00:00:00`);
         return !Number.isNaN(date.getTime()) && value === date.toISOString().slice(0, 10);
+      })
+      .test("not-past-date", "Informe uma data igual ou posterior a hoje.", (value) => {
+        if (!value) {
+          return true;
+        }
+
+        return value >= todayAsApiDate();
       })
       .default(""),
   })

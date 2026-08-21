@@ -136,10 +136,18 @@ export const BoardGrid = styled.div`
   }
 `;
 
-export const Column = styled.article`
+export const Column = styled.article<{ $isDropTarget?: boolean }>`
   min-height: 320px;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: #f7f7f8;
+
+  ${({ $isDropTarget, theme }) =>
+    $isDropTarget &&
+    css`
+      border-color: ${theme.colors.primary_dark};
+      background: rgba(67, 190, 198, 0.08);
+    `}
 `;
 
 export const ColumnHeader = styled.header`
@@ -183,6 +191,10 @@ export const TaskCardButton = styled.button`
   text-align: left;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(9, 30, 66, 0.12);
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &:hover,
   &:focus-visible {

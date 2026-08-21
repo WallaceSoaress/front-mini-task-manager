@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { ValidationError } from "yup";
 import type { Task } from "../../interfaces/tasks/task";
 import type { Team } from "../../interfaces/tasks/team";
-import type { User } from "../../interfaces/tasks/user";
 import type { TaskFormData } from "../../validations/tasks/taskSchema";
-import { toTaskRequest, validateTaskForm } from "../../validations/tasks/taskSchema";
+import { normalizeDueDate, toTaskRequest, validateTaskForm } from "../../validations/tasks/taskSchema";
 import { priorityLabels, statusLabels } from "./labels";
 import { Button, Field, FieldError, FormGrid, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "./styles";
 
 type TaskFormModalProps = {
   task?: Task | null;
-  users: User[];
   teams: Team[];
   isLoading?: boolean;
   apiError?: string;
@@ -29,10 +27,11 @@ const defaultValues: TaskFormData = {
   dueDate: "",
 };
 
-export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose, onSubmit }: TaskFormModalProps) {
+export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSubmit }: TaskFormModalProps) {
   const [formError, setFormError] = useState("");
   const {
     clearErrors,
+    control,
     formState: { errors },
     getValues,
     handleSubmit,
@@ -43,6 +42,10 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
   } = useForm<TaskFormData>({
     defaultValues,
   });
+  const selectedTeamId = useWatch({ control, name: "teamId" });
+  const selectedResponsibleId = useWatch({ control, name: "responsibleId" });
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId);
+  const responsibleOptions = selectedTeam?.members ?? [];
 
   useEffect(() => {
     reset(
@@ -68,6 +71,19 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
     }
   }, [getValues, setValue, task, teams]);
 
+  useEffect(() => {
+    if (!selectedResponsibleId || !selectedTeam) {
+      return;
+    }
+
+    const responsibleBelongsToTeam = selectedTeam.members.some((member) => member.id === selectedResponsibleId);
+
+    if (!responsibleBelongsToTeam) {
+      setValue("responsibleId", "", { shouldDirty: true, shouldValidate: true });
+      clearErrors("responsibleId");
+    }
+  }, [clearErrors, selectedResponsibleId, selectedTeam, setValue]);
+
   function registerField(field: keyof TaskFormData) {
     return register(field, {
       onChange: () => {
@@ -79,9 +95,13 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
 
   async function submit(data: TaskFormData) {
     setFormError("");
+    clearErrors();
 
     try {
-      const validData = await validateTaskForm(data);
+      const validData = await validateTaskForm({
+        ...data,
+        dueDate: normalizeDueDate(data.dueDate),
+      });
       await onSubmit(toTaskRequest(validData));
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -149,19 +169,6 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
             </Field>
 
             <Field>
-              Responsavel
-              <select {...registerField("responsibleId")}>
-                <option value="">Nao atribuido</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-              {errors.responsibleId?.message ? <FieldError>{errors.responsibleId.message}</FieldError> : null}
-            </Field>
-
-            <Field>
               Time
               <select {...registerField("teamId")}>
                 <option value="">Selecione</option>
@@ -172,6 +179,19 @@ export function TaskFormModal({ task, users, teams, isLoading, apiError, onClose
                 ))}
               </select>
               {errors.teamId?.message ? <FieldError>{errors.teamId.message}</FieldError> : null}
+            </Field>
+
+            <Field>
+              Responsavel
+              <select {...registerField("responsibleId")} disabled={!selectedTeamId}>
+                <option value="">Nao atribuido</option>
+                {responsibleOptions.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+              {errors.responsibleId?.message ? <FieldError>{errors.responsibleId.message}</FieldError> : null}
             </Field>
 
             <Field className="full">
