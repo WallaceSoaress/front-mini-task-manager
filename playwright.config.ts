@@ -1,5 +1,19 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const port = process.env.PLAYWRIGHT_PORT ?? "5173";
+const baseURL = `http://127.0.0.1:${port}`;
+const webServer = process.env.PLAYWRIGHT_SKIP_WEB_SERVER
+  ? undefined
+  : {
+      command: `yarn dev --host 127.0.0.1 --port ${port}`,
+      env: {
+        VITE_API_BASE_URL: "http://127.0.0.1:3333",
+      },
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    };
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -8,18 +22,10 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://127.0.0.1:5173",
+    baseURL,
     trace: "on-first-retry",
   },
-  webServer: {
-    command: "yarn dev --host 127.0.0.1 --port 5173",
-    env: {
-      VITE_API_BASE_URL: "http://127.0.0.1:3333",
-    },
-    url: "http://127.0.0.1:5173",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer,
   projects: [
     {
       name: "chromium",

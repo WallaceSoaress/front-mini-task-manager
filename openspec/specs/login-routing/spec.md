@@ -16,7 +16,7 @@ O sistema SHALL expor uma rota publica de login para usuarios nao autenticados.
 - **THEN** os estilos visiveis do login usam as cores e tokens de tipografia do tema da aplicacao
 
 ### Requirement: Envio de login baseado em cookie
-O sistema SHALL enviar credenciais de login para a URL configurada da API com inclusao de credenciais do navegador e SHALL recuperar a sessao autenticada atual por um endpoint semanticamente claro.
+O sistema SHALL enviar credenciais de login para a URL configurada da API com inclusao de credenciais do navegador e SHALL recuperar a sessao autenticada atual por `GET /auth/session`.
 
 #### Scenario: Usuario envia credenciais validas
 - **WHEN** o usuario envia e-mail e senha pela pagina de login
@@ -35,12 +35,16 @@ O sistema SHALL enviar credenciais de login para a URL configurada da API com in
 - **THEN** o sistema usa `GET /auth/session` para retornar os dados do usuario autenticado atual
 
 #### Scenario: Endpoint legado de usuario atual permanece compativel
-- **WHEN** um consumidor existente chama `GET /auth/me` com uma sessao valida
-- **THEN** o sistema retorna os mesmos dados do usuario autenticado atual sem quebrar compatibilidade
+- **WHEN** um consumidor chama `GET /auth/me`
+- **THEN** o sistema nao expoe mais esse endpoint legado, e consumidores devem usar `GET /auth/session`
+
+#### Scenario: Endpoint legado de usuario atual nao e exposto
+- **WHEN** a API e a documentacao Swagger/OpenAPI listam endpoints de autenticacao
+- **THEN** `GET /auth/me` nao e exposto, e a recuperacao do usuario autenticado atual fica concentrada em `GET /auth/session`
 
 #### Scenario: Documentacao da sessao autenticada e clara
 - **WHEN** a documentacao Swagger/OpenAPI lista os endpoints de autenticacao
-- **THEN** `GET /auth/session` aparece com resumo e descricao que indicam que ele obtem a sessao ou usuario autenticado atual
+- **THEN** `GET /auth/session` aparece com summary e descricao que indicam que ele obtem a sessao ou usuario autenticado atual
 
 ### Requirement: Rota privada apos login
 O sistema SHALL renderizar rotas privadas da aplicacao apenas depois que o frontend marcar o usuario como autenticado.
