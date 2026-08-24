@@ -200,6 +200,13 @@ A API permanece como fonte de verdade para regras de domínio.
 - Services dedicados para chamadas HTTP.
 - Playwright para validar fluxos principais.
 
+## Trade-offs
+
+- React com Vite foi escolhido para manter a entrega simples, rápida e fácil de executar localmente.
+- O frontend valida formulários para melhorar a experiência do usuário, mas a API continua sendo a fonte de verdade para regras de domínio.
+- Os testes automatizados usam Playwright E2E para cobrir os fluxos principais em vez de uma suíte grande de testes unitários de componentes.
+- O frontend fica em repositório separado da API para facilitar a entrega independente dos links solicitados.
+
 ## Como Validar o Fluxo Integrado
 
 1. Suba a API em `http://localhost:8080`.
@@ -214,3 +221,14 @@ A API permanece como fonte de verdade para regras de domínio.
 
 - A tela de times cria e exclui times, mas não edita membros depois da criação.
 - Não há autorização granular por papel ou dono da tarefa no frontend; essa evolução depende das regras da API.
+
+## O que ficou de fora e por quê
+
+- Edição de membros de times: ficou fora para priorizar o fluxo obrigatório de criação de times e gerenciamento de tarefas.
+- Dashboard analítico: ficou fora por não ser requisito obrigatório da prova.
+- Autorização visual por perfil ou dono da tarefa: ficou fora porque depende de regras granulares na API.
+- Ambiente publicado: ficou fora porque a entrega foi preparada para execução local integrada com a API.
+
+## Ambiente publicado
+
+Não há ambiente publicado para este frontend. A forma de avaliação prevista é a execução local descrita neste README.
