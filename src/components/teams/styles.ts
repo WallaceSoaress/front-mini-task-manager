@@ -76,6 +76,66 @@ export const HelperText = styled.span`
   font-weight: 500;
 `;
 
+export const MemberOptionList = styled.div`
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  background: ${({ theme }) => theme.colors.white};
+`;
+
+export const MemberOption = styled.label<{ $selected: boolean }>`
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 1px solid
+    ${({ $selected, theme }) => ($selected ? theme.colors.primary : theme.colors.border)};
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text_black};
+  background: ${({ $selected, theme }) => ($selected ? theme.colors.primary_light : theme.colors.lighter)};
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: ${({ theme }) => theme.colors.primary};
+    cursor: pointer;
+  }
+
+  span {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  strong,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+
+  small {
+    color: ${({ theme }) => theme.colors.dark};
+    font-size: 13px;
+  }
+
+  &:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+`;
+
 export const SuccessMessage = styled.p`
   margin: 0;
   border: 1px solid ${({ theme }) => theme.colors.success};

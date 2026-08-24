@@ -5,7 +5,7 @@ import type { User } from "../../interfaces/tasks/user";
 import type { TeamFormData } from "../../validations/teams/teamSchema";
 import { toTeamRequest, validateTeamForm } from "../../validations/teams/teamSchema";
 import { Button, Field, FieldError, FormGrid, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "../tasks/styles";
-import { HelperText } from "./styles";
+import { HelperText, MemberOption, MemberOptionList } from "./styles";
 
 type TeamFormModalProps = {
   users: User[];
@@ -35,6 +35,15 @@ export function TeamFormModal({ users, isLoading, isLoadingUsers, usersError, ap
     defaultValues,
   });
   const selectedMemberIds = useWatch({ control, name: "memberIds" }) ?? [];
+  const selectedMemberIdSet = new Set(selectedMemberIds);
+
+  function toggleMember(memberId: string) {
+    const nextMemberIds = selectedMemberIdSet.has(memberId)
+      ? selectedMemberIds.filter((selectedMemberId) => selectedMemberId !== memberId)
+      : [...selectedMemberIds, memberId];
+
+    setValue("memberIds", nextMemberIds, { shouldDirty: true, shouldValidate: true });
+  }
 
   async function submit(data: TeamFormData) {
     setFormError("");
@@ -82,22 +91,26 @@ export function TeamFormModal({ users, isLoading, isLoadingUsers, usersError, ap
 
             <Field className="full">
               Membros
-              <select
-                multiple
-                size={Math.min(Math.max(users.length, 3), 8)}
-                value={selectedMemberIds}
-                onChange={(event) => {
-                  const memberIds = Array.from(event.currentTarget.selectedOptions, (option) => option.value);
-                  setValue("memberIds", memberIds, { shouldDirty: true, shouldValidate: true });
-                }}
-                disabled={isLoadingUsers || Boolean(usersError)}
-              >
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} - {user.email}
-                  </option>
-                ))}
-              </select>
+              <MemberOptionList aria-label="Membros disponiveis">
+                {users.map((user) => {
+                  const isSelected = selectedMemberIdSet.has(user.id);
+
+                  return (
+                    <MemberOption key={user.id} $selected={isSelected}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        disabled={isLoadingUsers || Boolean(usersError)}
+                        onChange={() => toggleMember(user.id)}
+                      />
+                      <span>
+                        <strong>{user.name}</strong>
+                        <small>{user.email}</small>
+                      </span>
+                    </MemberOption>
+                  );
+                })}
+              </MemberOptionList>
               <HelperText>
                 {usersError ||
                   (isLoadingUsers
