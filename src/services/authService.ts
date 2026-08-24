@@ -40,7 +40,7 @@ export async function registerUser(data: RegisterRequest) {
 }
 
 export async function getCurrentUser() {
-  return apiFetch<AuthenticatedUser>("/auth/me");
+  return apiFetch<AuthenticatedUser>("/auth/session");
 }
 
 export async function logout() {

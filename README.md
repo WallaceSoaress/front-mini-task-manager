@@ -187,7 +187,7 @@ Endpoints consumidos:
 ```text
 POST   /auth/register
 POST   /auth/login
-GET    /auth/me
+GET    /auth/session
 POST   /auth/logout
 GET    /users
 GET    /teams
@@ -218,7 +218,7 @@ O frontend não lê nem armazena o JWT. A API envia o token em cookie HttpOnly e
 Fluxo:
 
 ```text
-Login -> API envia cookie HttpOnly -> frontend usa credentials: "include" -> GET /auth/me recupera a sessão ao recarregar
+Login -> API envia cookie HttpOnly -> frontend usa credentials: "include" -> GET /auth/session recupera a sessão ao recarregar
 ```
 
 ## Telas

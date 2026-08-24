@@ -89,7 +89,7 @@ function taskFromRequest(payload: TaskRequest): Task {
 }
 
 export async function mockUnauthenticatedUser(page: Page) {
-  await page.route(`${API_URL}/auth/me`, (route) =>
+  await page.route(`${API_URL}/auth/session`, (route) =>
     route.fulfill(jsonResponse(401, { message: "Nao autenticado." })),
   );
 }
@@ -103,7 +103,7 @@ export async function mockPublicAuthApi(
     registerRequests: [],
   };
 
-  await page.route(`${API_URL}/auth/me`, (route) => {
+  await page.route(`${API_URL}/auth/session`, (route) => {
     if (options.authenticated) {
       return route.fulfill(jsonResponse(200, authenticatedUser));
     }
@@ -148,7 +148,7 @@ export async function mockTaskApi(
     updateRequests: [],
   };
 
-  await page.route(`${API_URL}/auth/me`, (route) =>
+  await page.route(`${API_URL}/auth/session`, (route) =>
     route.fulfill(jsonResponse(200, authenticatedUser)),
   );
   await page.route(`${API_URL}/auth/logout`, (route) => route.fulfill({ status: 204 }));

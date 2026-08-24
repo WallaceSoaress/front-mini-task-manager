@@ -27,7 +27,7 @@ test.describe("Times", () => {
     const createRequests: TeamRequest[] = [];
     const createdTeams: Team[] = [];
 
-    await page.route(`${API_URL}/auth/me`, (route) =>
+    await page.route(`${API_URL}/auth/session`, (route) =>
       route.fulfill(jsonResponse(200, authenticatedUser)),
     );
     await page.route(`${API_URL}/users`, (route) =>
