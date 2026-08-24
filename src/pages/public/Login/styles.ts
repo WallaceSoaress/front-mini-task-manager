@@ -7,20 +7,22 @@ export const PageShell = styled.main`
   place-items: center;
   padding: 32px 16px;
   box-sizing: border-box;
-  background:
-    linear-gradient(135deg, rgba(67, 190, 198, 0.12), rgba(21, 119, 67, 0.08)),
-    ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.background};
 `;
 
 export const LoginPanel = styled.section`
   width: min(100%, 420px);
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 8px;
-  padding: 32px;
+  padding: 34px;
   box-sizing: border-box;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 18px 50px rgba(41, 67, 78, 0.12);
+  box-shadow: 0 18px 46px rgba(16, 24, 40, 0.1);
   text-align: left;
+
+  @media (max-width: 480px) {
+    padding: 24px;
+  }
 `;
 
 export const HeaderGroup = styled.header`
@@ -31,12 +33,16 @@ export const HeaderGroup = styled.header`
   span {
     color: ${({ theme }) => theme.colors.primary_dark};
     font-size: ${({ theme }) => theme.fonts.size.small};
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
   }
 
   h1 {
     margin: 0;
+    color: ${({ theme }) => theme.colors.darker};
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.15;
   }
 `;
 
@@ -53,6 +59,24 @@ export const Form = styled.form`
     cursor: pointer;
     font: inherit;
     font-weight: 700;
+    box-shadow: 0 8px 18px rgba(8, 119, 130, 0.18);
+    transition:
+      background 140ms ease,
+      box-shadow 140ms ease,
+      transform 140ms ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary};
+  }
+
+  button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(17, 153, 163, 0.2);
+  }
+
+  button:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   button:disabled {
@@ -80,11 +104,20 @@ export const Field = styled.div`
     background: ${({ theme }) => theme.colors.white};
     font: inherit;
     box-sizing: border-box;
+    transition:
+      border-color 140ms ease,
+      box-shadow 140ms ease,
+      background 140ms ease;
+  }
+
+  input::placeholder {
+    color: ${({ theme }) => theme.colors.placeholder};
   }
 
   input:focus {
     border-color: ${({ theme }) => theme.colors.primary_dark};
-    outline: 3px solid rgba(67, 190, 198, 0.18);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(17, 153, 163, 0.16);
   }
 `;
 
@@ -95,6 +128,7 @@ export const ErrorMessage = styled.p`
   color: ${({ theme }) => theme.colors.danger};
   background: ${({ theme }) => theme.colors.error_light};
   font-size: ${({ theme }) => theme.fonts.size.small};
+  line-height: 1.45;
 `;
 
 export const SuccessMessage = styled.p`
@@ -104,6 +138,7 @@ export const SuccessMessage = styled.p`
   color: ${({ theme }) => theme.colors.success};
   background: ${({ theme }) => theme.colors.success_light};
   font-size: ${({ theme }) => theme.fonts.size.small};
+  line-height: 1.45;
 `;
 
 export const SwitchAuthText = styled.p`
@@ -114,7 +149,7 @@ export const SwitchAuthText = styled.p`
 
   a {
     color: ${({ theme }) => theme.colors.primary_dark};
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
   }
 

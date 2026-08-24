@@ -49,7 +49,7 @@ tests/e2e/        testes Playwright
 
 ## Pré-requisitos
 
-- Node.js compatível com Vite 8.
+- Node.js compatível com Vite 8 node 24.16.0 +.
 - npm.
 - API Mini Task Manager em execução para testar o fluxo integrado.
 - Docker Desktop e Docker Compose, caso queira executar API, banco e frontend juntos.
