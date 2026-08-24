@@ -57,11 +57,15 @@ O sistema SHALL suportar a listagem paginada de tarefas retornada pela API.
 - **THEN** o sistema exibe um estado vazio claro e uma acao para criar tarefa quando apropriado
 
 ### Requirement: Criacao de tarefa
-O sistema SHALL permitir criar tarefas vinculadas a um time, com status, prioridade, titulo, descricao, prazo e responsavel opcional, enviando para a API os valores definidos pelo contrato de `POST /tasks`, validando campos atuais do formulario e permitindo selecionar responsavel somente entre membros do time escolhido.
+O sistema SHALL permitir criar tarefas vinculadas a um time, com status, prioridade, titulo, descricao, prazo e responsavel opcional, enviando para a API os valores definidos pelo contrato de `POST /tasks`, validando os valores atuais exibidos no formulario e permitindo selecionar responsavel somente entre membros do time escolhido.
 
 #### Scenario: Usuario cria tarefa valida
 - **WHEN** o usuario preenche os campos obrigatorios e envia o formulario de criacao com prazo vazio, data atual ou data futura
 - **THEN** o sistema envia `title`, `description`, `status`, `priority`, `responsibleId`, `teamId` e `dueDate` conforme o contrato da API, cria a tarefa, fecha o formulario e atualiza o board sem recarregar a pagina
+
+#### Scenario: Campos preenchidos alimentam a submissao
+- **WHEN** o usuario digita titulo, descricao e prazo ou seleciona status, prioridade, time e responsavel no formulario de tarefa
+- **THEN** o sistema valida e submete os valores atuais desses campos, sem substituir entradas preenchidas por valores vazios ou padroes obsoletos
 
 #### Scenario: Usuario envia formulario incompleto
 - **WHEN** campos obrigatorios estao ausentes ou invalidos
