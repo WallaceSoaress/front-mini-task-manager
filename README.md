@@ -97,6 +97,12 @@ http://localhost:5173
 
 ## Executando Localmente
 
+Node:
+
+```bash
+26.0.0
+```
+
 Instale as dependências:
 
 ```bash
