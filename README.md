@@ -52,6 +52,7 @@ tests/e2e/        testes Playwright
 - Node.js compatível com Vite 8.
 - npm.
 - API Mini Task Manager em execução para testar o fluxo integrado.
+- Docker Desktop e Docker Compose, caso queira executar API, banco e frontend juntos.
 
 ## Configuração
 
@@ -86,6 +87,61 @@ Acesse:
 ```text
 http://localhost:5173
 ```
+
+## Executando com Docker Compose integrado
+
+O ambiente completo é orquestrado pelo `docker-compose.yml` da API. Mantenha os
+repositórios lado a lado:
+
+```text
+prova-tecnica/
+  api-mini-task-manager/
+  front-mini-task-manager/
+```
+
+Na raiz da API, execute:
+
+```bash
+docker compose up --build
+```
+
+Serviços expostos:
+
+```text
+Frontend: http://localhost:5173
+API: http://localhost:8080
+Swagger: http://localhost:8080/swagger/index.html
+Health check: http://localhost:8080/actuator/health
+PostgreSQL: localhost:5432
+```
+
+Para executar em segundo plano:
+
+```bash
+docker compose up -d --build
+```
+
+Para verificar os containers:
+
+```bash
+docker compose ps
+```
+
+Para parar:
+
+```bash
+docker compose down
+```
+
+Para parar e remover o volume local do banco:
+
+```bash
+docker compose down -v
+```
+
+O build Docker do frontend recebe `VITE_API_BASE_URL=http://localhost:8080`.
+Essa URL deve apontar para a API vista pelo navegador, nao para o nome interno
+do container.
 
 ## Scripts
 
@@ -209,9 +265,9 @@ A API permanece como fonte de verdade para regras de domínio.
 
 ## Como Validar o Fluxo Integrado
 
-1. Suba a API em `http://localhost:8080`.
-2. Inicie o frontend com `npm run dev`.
-3. Acesse `http://localhost:5173`.
+1. Suba o ambiente integrado com `docker compose up --build` na raiz da API.
+2. Acesse `http://localhost:5173`.
+3. Verifique a API em `http://localhost:8080/actuator/health`.
 4. Cadastre um usuário ou faça login.
 5. Crie um time.
 6. Crie uma tarefa associada ao time.
