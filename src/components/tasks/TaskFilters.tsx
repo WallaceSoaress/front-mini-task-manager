@@ -75,7 +75,7 @@ export function TaskFilters({ filters, users, onChange, onCreate, isLoadingUsers
 
         <Field>
           Acoes
-          <Button type="button" $variant="ghost" onClick={() => onChange({})}>
+          <Button type="button" $variant="ghost" aria-label="Limpar filtros" onClick={() => onChange({})}>
             Limpar filtros
           </Button>
         </Field>

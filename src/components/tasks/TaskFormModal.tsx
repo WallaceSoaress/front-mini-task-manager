@@ -192,7 +192,7 @@ export function TaskFormModal({
               Titulo
               <input {...registerField("title")} autoFocus maxLength={160} />
               {errors.title?.message ? (
-                <FieldError>{errors.title.message}</FieldError>
+                <FieldError role="alert">{errors.title.message}</FieldError>
               ) : null}
             </Field>
 
@@ -200,7 +200,7 @@ export function TaskFormModal({
               Descricao
               <textarea {...registerField("description")} />
               {errors.description?.message ? (
-                <FieldError>{errors.description.message}</FieldError>
+                <FieldError role="alert">{errors.description.message}</FieldError>
               ) : null}
             </Field>
 
@@ -214,7 +214,7 @@ export function TaskFormModal({
                 ))}
               </select>
               {errors.status?.message ? (
-                <FieldError>{errors.status.message}</FieldError>
+                <FieldError role="alert">{errors.status.message}</FieldError>
               ) : null}
             </Field>
 
@@ -228,7 +228,7 @@ export function TaskFormModal({
                 ))}
               </select>
               {errors.priority?.message ? (
-                <FieldError>{errors.priority.message}</FieldError>
+                <FieldError role="alert">{errors.priority.message}</FieldError>
               ) : null}
             </Field>
 
@@ -243,7 +243,7 @@ export function TaskFormModal({
                 ))}
               </select>
               {errors.teamId?.message ? (
-                <FieldError>{errors.teamId.message}</FieldError>
+                <FieldError role="alert">{errors.teamId.message}</FieldError>
               ) : null}
             </Field>
 
@@ -261,7 +261,7 @@ export function TaskFormModal({
                 ))}
               </select>
               {errors.responsibleId?.message ? (
-                <FieldError>{errors.responsibleId.message}</FieldError>
+                <FieldError role="alert">{errors.responsibleId.message}</FieldError>
               ) : null}
             </Field>
 
@@ -269,12 +269,14 @@ export function TaskFormModal({
               Prazo
               <input {...registerField("dueDate")} type="date" />
               {errors.dueDate?.message ? (
-                <FieldError>{errors.dueDate.message}</FieldError>
+                <FieldError role="alert">{errors.dueDate.message}</FieldError>
               ) : null}
             </Field>
 
             {apiError || formError ? (
-              <FieldError className="full">{apiError || formError}</FieldError>
+              <FieldError className="full" role="alert">
+                {apiError || formError}
+              </FieldError>
             ) : null}
 
             <ModalActions>
