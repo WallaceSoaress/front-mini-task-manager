@@ -1,12 +1,26 @@
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { ValidationError } from "yup";
 import type { Task } from "../../interfaces/tasks/task";
 import type { Team } from "../../interfaces/tasks/team";
 import type { TaskFormData } from "../../validations/tasks/taskSchema";
-import { normalizeDueDate, toTaskRequest, validateTaskForm } from "../../validations/tasks/taskSchema";
+import {
+  normalizeDueDate,
+  toTaskRequest,
+  validateTaskForm,
+} from "../../validations/tasks/taskSchema";
 import { priorityLabels, statusLabels } from "./labels";
-import { Button, Field, FieldError, FormGrid, ModalActions, ModalBackdrop, ModalBody, ModalHeader, ModalPanel } from "./styles";
+import {
+  Button,
+  Field,
+  FieldError,
+  FormGrid,
+  ModalActions,
+  ModalBackdrop,
+  ModalBody,
+  ModalHeader,
+  ModalPanel,
+} from "./styles";
 
 type TaskFormModalProps = {
   task?: Task | null;
@@ -27,7 +41,19 @@ const defaultValues: TaskFormData = {
   dueDate: "",
 };
 
-export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSubmit }: TaskFormModalProps) {
+type TaskFieldElement =
+  | HTMLInputElement
+  | HTMLSelectElement
+  | HTMLTextAreaElement;
+
+export function TaskFormModal({
+  task,
+  teams,
+  isLoading,
+  apiError,
+  onClose,
+  onSubmit,
+}: TaskFormModalProps) {
   const [formError, setFormError] = useState("");
   const {
     clearErrors,
@@ -76,21 +102,34 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
       return;
     }
 
-    const responsibleBelongsToTeam = selectedTeam.members.some((member) => member.id === selectedResponsibleId);
+    const responsibleBelongsToTeam = selectedTeam.members.some(
+      (member) => member.id === selectedResponsibleId,
+    );
 
     if (!responsibleBelongsToTeam) {
-      setValue("responsibleId", "", { shouldDirty: true, shouldValidate: true });
+      setValue("responsibleId", "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
       clearErrors("responsibleId");
     }
   }, [clearErrors, selectedResponsibleId, selectedTeam, setValue]);
 
   function registerField(field: keyof TaskFormData) {
-    return register(field, {
-      onChange: () => {
+    const registration = register(field);
+
+    return {
+      ...registration,
+      onChange: (event: ChangeEvent<TaskFieldElement>) => {
+        void registration.onChange(event);
+        setValue(field, event.currentTarget.value, {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
         clearErrors(field);
         setFormError("");
       },
-    });
+    };
   }
 
   async function submit(data: TaskFormData) {
@@ -107,7 +146,9 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
       if (err instanceof ValidationError) {
         err.inner.forEach((issue) => {
           if (issue.path) {
-            setError(issue.path as keyof TaskFormData, { message: issue.message });
+            setError(issue.path as keyof TaskFormData, {
+              message: issue.message,
+            });
           }
         });
         return;
@@ -119,13 +160,28 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
 
   return (
     <ModalBackdrop role="presentation">
-      <ModalPanel role="dialog" aria-modal="true" aria-labelledby="task-form-title">
+      <ModalPanel
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="task-form-title"
+      >
         <ModalHeader>
           <div>
-            <h2 id="task-form-title">{task ? "Editar tarefa" : "Criar tarefa"}</h2>
-            <p>{task ? "Atualize os dados da demanda." : "Cadastre uma nova demanda do time."}</p>
+            <h2 id="task-form-title">
+              {task ? "Editar tarefa" : "Criar tarefa"}
+            </h2>
+            <p>
+              {task
+                ? "Atualize os dados da demanda."
+                : "Cadastre uma nova demanda do time."}
+            </p>
           </div>
-          <Button type="button" $variant="ghost" onClick={onClose} disabled={isLoading}>
+          <Button
+            type="button"
+            $variant="ghost"
+            onClick={onClose}
+            disabled={isLoading}
+          >
             Fechar
           </Button>
         </ModalHeader>
@@ -135,13 +191,17 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
             <Field>
               Titulo
               <input {...registerField("title")} autoFocus maxLength={160} />
-              {errors.title?.message ? <FieldError>{errors.title.message}</FieldError> : null}
+              {errors.title?.message ? (
+                <FieldError>{errors.title.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field>
               Descricao
               <textarea {...registerField("description")} />
-              {errors.description?.message ? <FieldError>{errors.description.message}</FieldError> : null}
+              {errors.description?.message ? (
+                <FieldError>{errors.description.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field>
@@ -153,7 +213,9 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
                   </option>
                 ))}
               </select>
-              {errors.status?.message ? <FieldError>{errors.status.message}</FieldError> : null}
+              {errors.status?.message ? (
+                <FieldError>{errors.status.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field>
@@ -165,7 +227,9 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
                   </option>
                 ))}
               </select>
-              {errors.priority?.message ? <FieldError>{errors.priority.message}</FieldError> : null}
+              {errors.priority?.message ? (
+                <FieldError>{errors.priority.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field>
@@ -178,12 +242,17 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
                   </option>
                 ))}
               </select>
-              {errors.teamId?.message ? <FieldError>{errors.teamId.message}</FieldError> : null}
+              {errors.teamId?.message ? (
+                <FieldError>{errors.teamId.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field>
               Responsavel
-              <select {...registerField("responsibleId")} disabled={!selectedTeamId}>
+              <select
+                {...registerField("responsibleId")}
+                disabled={!selectedTeamId}
+              >
                 <option value="">Nao atribuido</option>
                 {responsibleOptions.map((member) => (
                   <option key={member.id} value={member.id}>
@@ -191,19 +260,30 @@ export function TaskFormModal({ task, teams, isLoading, apiError, onClose, onSub
                   </option>
                 ))}
               </select>
-              {errors.responsibleId?.message ? <FieldError>{errors.responsibleId.message}</FieldError> : null}
+              {errors.responsibleId?.message ? (
+                <FieldError>{errors.responsibleId.message}</FieldError>
+              ) : null}
             </Field>
 
             <Field className="full">
               Prazo
               <input {...registerField("dueDate")} type="date" />
-              {errors.dueDate?.message ? <FieldError>{errors.dueDate.message}</FieldError> : null}
+              {errors.dueDate?.message ? (
+                <FieldError>{errors.dueDate.message}</FieldError>
+              ) : null}
             </Field>
 
-            {apiError || formError ? <FieldError className="full">{apiError || formError}</FieldError> : null}
+            {apiError || formError ? (
+              <FieldError className="full">{apiError || formError}</FieldError>
+            ) : null}
 
             <ModalActions>
-              <Button type="button" $variant="ghost" onClick={onClose} disabled={isLoading}>
+              <Button
+                type="button"
+                $variant="ghost"
+                onClick={onClose}
+                disabled={isLoading}
+              >
                 Cancelar
               </Button>
               <Button type="submit" disabled={isLoading || !teams.length}>
