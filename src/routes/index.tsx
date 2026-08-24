@@ -17,11 +17,11 @@ export function AppRoutes() {
           <>
             <Route path="/*" element={<PrivateRoutes />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/register" element={<Navigate to="/" replace />} />
           </>
         ) : (
           <>
-            <Route path="/login" element={<PublicRoutes />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="/*" element={<PublicRoutes />} />
           </>
         )}
       </Routes>

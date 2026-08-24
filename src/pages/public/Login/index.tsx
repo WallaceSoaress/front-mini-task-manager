@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { Link } from "react-router";
 import { useAuth } from "../../../hooks/auth";
 import { ApiRequestError } from "../../../services/api";
 import {
@@ -9,6 +10,7 @@ import {
   HeaderGroup,
   LoginPanel,
   PageShell,
+  SwitchAuthText,
 } from "./styles";
 
 const Login = () => {
@@ -76,6 +78,10 @@ const Login = () => {
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
         </Form>
+
+        <SwitchAuthText>
+          Nao possui uma conta? <Link to="/register">Cadastre-se</Link>
+        </SwitchAuthText>
       </LoginPanel>
     </PageShell>
   );

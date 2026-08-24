@@ -91,7 +91,35 @@ export const Field = styled.div`
 export const ErrorMessage = styled.p`
   border-radius: 8px;
   padding: 12px 14px;
+  margin: 0;
   color: ${({ theme }) => theme.colors.danger};
   background: ${({ theme }) => theme.colors.error_light};
   font-size: ${({ theme }) => theme.fonts.size.small};
+`;
+
+export const SuccessMessage = styled.p`
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0;
+  color: ${({ theme }) => theme.colors.success};
+  background: ${({ theme }) => theme.colors.success_light};
+  font-size: ${({ theme }) => theme.fonts.size.small};
+`;
+
+export const SwitchAuthText = styled.p`
+  margin: 18px 0 0;
+  color: ${({ theme }) => theme.colors.dark};
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  text-align: center;
+
+  a {
+    color: ${({ theme }) => theme.colors.primary_dark};
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  a:focus,
+  a:hover {
+    text-decoration: underline;
+  }
 `;

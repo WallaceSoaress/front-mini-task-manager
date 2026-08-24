@@ -23,6 +23,12 @@ type ApiMocksOptions = {
   pageFactory?: (request: Request, tasks: Task[]) => PageableResponse<Task>;
 };
 
+type PublicAuthMocksOptions = {
+  authenticated?: boolean;
+  registerError?: string;
+  registerDelayMs?: number;
+};
+
 const API_URL = "http://127.0.0.1:3333";
 
 export type ApiMocks = {
@@ -30,6 +36,18 @@ export type ApiMocks = {
   deleteRequests: string[];
   listRequests: URL[];
   updateRequests: Array<{ id: string; payload: TaskRequest }>;
+};
+
+export type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+};
+
+export type PublicAuthMocks = {
+  loginRequests: Array<{ email: string; password: string }>;
+  registerRequests: RegisterRequest[];
 };
 
 function jsonResponse(status: number, body: JsonValue) {
@@ -74,6 +92,46 @@ export async function mockUnauthenticatedUser(page: Page) {
   await page.route(`${API_URL}/auth/me`, (route) =>
     route.fulfill(jsonResponse(401, { message: "Nao autenticado." })),
   );
+}
+
+export async function mockPublicAuthApi(
+  page: Page,
+  options: PublicAuthMocksOptions = {},
+): Promise<PublicAuthMocks> {
+  const calls: PublicAuthMocks = {
+    loginRequests: [],
+    registerRequests: [],
+  };
+
+  await page.route(`${API_URL}/auth/me`, (route) => {
+    if (options.authenticated) {
+      return route.fulfill(jsonResponse(200, authenticatedUser));
+    }
+
+    return route.fulfill(jsonResponse(401, { message: "Nao autenticado." }));
+  });
+
+  await page.route(`${API_URL}/auth/login`, async (route, request) => {
+    calls.loginRequests.push(request.postDataJSON() as { email: string; password: string });
+    await route.fulfill(jsonResponse(200, { tokenType: "Bearer", user: authenticatedUser }));
+  });
+
+  await page.route(`${API_URL}/auth/register`, async (route, request) => {
+    calls.registerRequests.push(request.postDataJSON() as RegisterRequest);
+
+    if (options.registerDelayMs) {
+      await new Promise((resolve) => setTimeout(resolve, options.registerDelayMs));
+    }
+
+    if (options.registerError) {
+      await route.fulfill(jsonResponse(400, { message: options.registerError }));
+      return;
+    }
+
+    await route.fulfill({ status: 201 });
+  });
+
+  return calls;
 }
 
 export async function mockTaskApi(

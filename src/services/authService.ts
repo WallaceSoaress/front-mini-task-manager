@@ -12,6 +12,12 @@ type LoginRequest = {
   password: string;
 };
 
+type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 type AuthResponse = {
   tokenType: "Bearer";
   user: AuthenticatedUser;
@@ -24,6 +30,13 @@ export async function login(credentials: LoginRequest) {
   });
 
   return response.user;
+}
+
+export async function registerUser(data: RegisterRequest) {
+  return apiFetch<void>("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 export async function getCurrentUser() {
