@@ -174,6 +174,17 @@ npm run test:e2e
 
 Os testes Playwright cobrem os principais fluxos de cadastro, autenticação, listagem, filtros, criação, validações, detalhes, edição, exclusão e paginação de tarefas.
 
+## CI
+
+Este repositório possui CI simples com GitHub Actions em `.github/workflows/ci.yml`.
+O workflow é executado em `push` para `main`/`master` e em `pull_request`,
+configura Node.js 24, instala as dependências e roda:
+
+```bash
+npm run lint
+npm run build
+```
+
 ## Integração com a API
 
 Base configurável:
@@ -255,12 +266,14 @@ A API permanece como fonte de verdade para regras de domínio.
 - Styled Components para estilo com tema centralizado.
 - Services dedicados para chamadas HTTP.
 - Playwright para validar fluxos principais.
+- GitHub Actions para validar lint e build automaticamente.
 
 ## Trade-offs
 
 - React com Vite foi escolhido para manter a entrega simples, rápida e fácil de executar localmente.
 - O frontend valida formulários para melhorar a experiência do usuário, mas a API continua sendo a fonte de verdade para regras de domínio.
 - Os testes automatizados usam Playwright E2E para cobrir os fluxos principais em vez de uma suíte grande de testes unitários de componentes.
+- O CI valida lint e build automaticamente, mas não executa CD/deploy neste momento porque a publicação exigiria configurar aplicações, banco PostgreSQL, CORS, cookies e variáveis de produção.
 - O frontend fica em repositório separado da API para facilitar a entrega independente dos links solicitados.
 
 ## Como Validar o Fluxo Integrado
@@ -283,7 +296,7 @@ A API permanece como fonte de verdade para regras de domínio.
 - Edição de membros de times: ficou fora para priorizar o fluxo obrigatório de criação de times e gerenciamento de tarefas.
 - Dashboard analítico: ficou fora por não ser requisito obrigatório da prova.
 - Autorização visual por perfil ou dono da tarefa: ficou fora porque depende de regras granulares na API.
-- Ambiente publicado: ficou fora porque a entrega foi preparada para execução local integrada com a API.
+- Ambiente publicado/CD: ficou fora porque a entrega foi preparada para execução local integrada com a API; a publicação exigiria preparar banco, CORS, cookies e variáveis de produção no provedor externo.
 
 ## Ambiente publicado
 
